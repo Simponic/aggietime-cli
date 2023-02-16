@@ -50,12 +50,12 @@ export const get_user_info = async () => {
   return expireCache.get("user");
 };
 
-export const clock_in = async ({ position } = {}) => {
+const do_clock_mutation = async (path, { position } = {}) => {
   position = await get_user_position_or_specified(position);
 
   return await aggietime
     .post(
-      replace_path_args(CLOCKIN_PATH, { position }),
+      replace_path_args(path, { position }),
       {
         comment: "",
       },
@@ -71,26 +71,8 @@ export const clock_in = async ({ position } = {}) => {
     });
 };
 
-export const clock_out = async ({ position } = {}) => {
-  position = await get_user_position_or_specified(position);
-
-  return await aggietime
-    .post(
-      replace_path_args(CLOCKOUT_PATH, { position }),
-      {
-        comment: "",
-      },
-      {
-        headers: {
-          "X-XSRF-TOKEN": expireCache.get("aggietime-csrf"),
-        },
-      }
-    )
-    .then(({ data }) => {
-      expireCache.remove("status_line");
-      return data;
-    });
-};
+export const clock_in = async (rest) => do_clock_mutation(CLOCKIN_PATH, rest);
+export const clock_out = async (rest) => do_clock_mutation(CLOCKOUT_PATH, rest);
 
 export const current_shift = async () => {
   const req_path = replace_path_args(OPEN_SHIFT_PATH, await get_user_info());
