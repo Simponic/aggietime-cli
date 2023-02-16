@@ -1,9 +1,8 @@
 # AggietimeD
 
-AggietimeD is a simple daemon service written in 2.5 days to do some hacked CAS authentication,
-then sit in the background, refreshing the AggieTime JWT periodically to ensure the session 
-doesn't expire, and listen to requests over a unix socket, making it easy to write scripts to 
-get Aggie Time data wherever you need it!
+AggietimeD is a simple daemon service written in 2.5 days to do some hacked CAS authentication
+sit in the background, and listen to requests over a unix socket - making it easy to write 
+scripts to get Aggie Time data wherever you need it!
 
 ## Installation
 
