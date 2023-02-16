@@ -1,8 +1,10 @@
 {
   "dependencies": {
+    "argparse": "^2.0.1",
     "axios": "^1.3.3",
     "axios-cookiejar-support": "^4.0.6",
     "dotenv": "^16.0.3",
+    "expire-cache": "^1.0.0",
     "node-html-parser": "^6.1.4",
     "tough-cookie": "^4.1.2"
   },
