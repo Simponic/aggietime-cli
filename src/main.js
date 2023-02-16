@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import {
   DEFAULT_SOCKET_PATH,
   KILL_SIGNALS,
@@ -10,7 +12,7 @@ import * as net from "net";
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 
-const main = async () => {
+export default async () => {
   dotenv.config();
   const args = build_args();
 
@@ -20,7 +22,26 @@ const main = async () => {
     } catch {
       fs.unlinkSync(args.socket_path);
     }
+  } else if (args.action) {
+    if (fs.existsSync(args.socket_path)) {
+      run_action(args.socket_path, args.action);
+    } else {
+      console.error(`ERR: No such socket '${args.socket_path}'`);
+    }
   }
+};
+
+const run_action = (socket_path, action) => {
+  const connection = net.connect(socket_path);
+  connection.on("data", (data) => {
+    if (Buffer.isBuffer(data)) {
+      console.log(data.toString().trim());
+    } else {
+      console.log(data.trim());
+    }
+    connection.end();
+  });
+  connection.write(JSON.stringify({ action }));
 };
 
 const build_args = () => {
@@ -29,12 +50,16 @@ const build_args = () => {
   parser.add_argument("-d", "--daemon", {
     help: "Start server as a process blocking daemon",
     action: argparse.BooleanOptionalAction,
-    default: true,
+    default: false,
   });
 
   parser.add_argument("-s", "--socket_path", {
     default: DEFAULT_SOCKET_PATH,
     help: `Set server socket path, defaults to ${DEFAULT_SOCKET_PATH}`,
+  });
+
+  parser.add_argument("-a", "--action", {
+    help: `Ignored when daemon flag is set. Returns the value of action (see actions.js) when sent over the socket.`,
   });
 
   return parser.parse_args();
@@ -76,7 +101,16 @@ specify another socket path with --socket_path`
         return;
       }
 
-      actions.do_action(body);
+      actions
+        .do_action(body)
+        .then((resp) => {
+          client.write(JSON.stringify(resp) + "\r\n");
+        })
+        .catch((e) => {
+          console.error(e);
+
+          client.write(JSON.stringify({ err: true }) + "\r\n");
+        });
     });
   });
 
@@ -90,5 +124,3 @@ specify another socket path with --socket_path`
     process.on(signal, () => kill_server(unix_server, socket_path))
   );
 };
-
-main();

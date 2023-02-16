@@ -3,11 +3,14 @@ export const KILL_SIGNALS = ["SIGINT", "SIGTERM", "SIGQUIT"];
 
 export const AGGIETIME_DOMAIN = "aggietimeultra.usu.edu";
 export const AGGIETIME_URI = `https://${AGGIETIME_DOMAIN}`;
+export const REFRESH_JWT_MS = 5 * 1000 * 60;
 export const LOGIN_PATH = "api/v1/auth/login";
 export const LOGOUT_PATH = "api/v1/auth/logout";
 export const CLOCKIN_PATH = "api/v1/positions/:position/clock_in";
+export const CLOCKOUT_PATH = "api/v1/positions/:position/clock_out";
 export const USER_PATH = "api/v1/auth/get_user_info";
-export const REFRESH_JWT_MS = 5 * 1000 * 60;
+export const OPEN_SHIFT_PATH = "api/v1/users/:anumber/open_shift";
+export const OPEN_SHIFT_EXP_SEC = 60;
 
 export const EXECUTION_SELECTOR = "input[type=hidden][name=execution]";
 export const DUO_IFRAME_SELECTOR = "#duo_iframe";
