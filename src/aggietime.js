@@ -9,6 +9,7 @@ import {
   OPEN_SHIFT_EXP_SEC,
 } from "./constants.js";
 
+import { with_exponential_retry } from "./exponential_retry.js";
 import { client } from "./axios_client.js";
 
 import expireCache from "expire-cache";
@@ -34,16 +35,18 @@ const get_user_position_or_specified = async (position) => {
 
 export const get_user_info = async () => {
   if (!expireCache.get("user")) {
-    const user = await aggietime.get(USER_PATH).then(({ data, config }) => {
-      const csrf_token = config.jar
-        .toJSON()
-        .cookies.find(
-          ({ domain, key }) =>
-            domain === AGGIETIME_DOMAIN && key === "XSRF-TOKEN"
-        ).value;
-      expireCache.set("aggietime-csrf", csrf_token);
-      return data;
-    });
+    const user = await with_exponential_retry(() =>
+      aggietime.get(USER_PATH).then(({ data, config }) => {
+        const csrf_token = config.jar
+          .toJSON()
+          .cookies.find(
+            ({ domain, key }) =>
+              domain === AGGIETIME_DOMAIN && key === "XSRF-TOKEN"
+          ).value;
+        expireCache.set("aggietime-csrf", csrf_token);
+        return data;
+      })
+    );
 
     expireCache.set("user", user, USER_CACHE_EXP_SEC);
   }

@@ -5,7 +5,6 @@ import {
   KILL_SIGNALS,
   REFRESH_JWT_MS,
 } from "./constants.js";
-import { with_exponential_retry } from "./exponential_retry.js";
 import * as actions from "./actions.js";
 import * as session from "./session.js";
 import * as argparse from "argparse";
@@ -87,9 +86,8 @@ specify another socket path with --socket_path`
     process.exit(1);
   }
 
-  await with_exponential_retry(() =>
-    session.login(process.env.A_NUMBER, process.env.PASSWORD)
-  );
+  await session.login(process.env.A_NUMBER, process.env.PASSWORD);
+
   session.refresh_jwt();
   setInterval(session.refresh_jwt, REFRESH_JWT_MS);
 
