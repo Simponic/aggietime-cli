@@ -1,6 +1,5 @@
 [Unit]
 Description=aggietimed
-After=network.target
 
 [Service]
 Type=simple
@@ -8,4 +7,4 @@ EnvironmentFile=/home/lizzy/work/simple_scripts/aggietime_cli/.env
 ExecStart=/usr/bin/aggietimed -d -s /tmp/aggietimed.sock
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
