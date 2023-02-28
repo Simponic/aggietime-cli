@@ -31,8 +31,8 @@ Then, set your A-Number and password in `.env`.
 
 UPDATE: (no) Thanks to the SAML update to AggieTime, we require selenium for auth.
 The SystemD service will not work. Instead, I suggest starting a script to watch
-`aggietimed` and restart if it fails, as in `watch_aggietimed.sh` with your window
-manager / desktop environment.
+`aggietimed` with your window manager / desktop environment, restarting if it fails, 
+as in `watch_aggietimed.sh`.
 
 If at some point CAS does come back, checkout the `cas-auth` branch.
 
