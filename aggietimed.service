@@ -1,0 +1,11 @@
+[Unit]
+Description=aggietimed
+Wants=display.target
+
+[Service]
+Environment=DISPLAY=:0
+Type=simple
+ExecStart=/usr/bin/aggietimed -d -s /tmp/aggietimed.sock
+
+[Install]
+WantedBy=default.target
