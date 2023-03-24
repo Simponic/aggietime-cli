@@ -6,6 +6,7 @@ import {
   AGGIETIME_DOMAIN,
   AGGIETIME_URI,
   AGGIETIME_URL_CONTAINS_SIGNIFIES_AUTH_COMPLETE,
+  DUO_TRUST_SELECTOR,
   LOGIN_PATH,
   SAML_SIGN_IN_TITLE,
   SAML_SUBMIT_SELECTOR,
@@ -60,8 +61,19 @@ export const login = async (a_number, password) => {
       await new Promise((res) => setTimeout(res, 500));
 
       console.log("Submit!");
-      await driver.findElement(By.css(SAML_SUBMIT_SELECTOR)).click();
+      await driver
+        .wait(until.elementLocated(By.css(SAML_SUBMIT_SELECTOR)))
+        .then(() => driver.findElement(By.css(SAML_SUBMIT_SELECTOR)).click());
     }
+
+    console.log('Press (fake and cringe) "remember me" buttons...');
+    await driver
+      .wait(until.elementLocated(By.css(DUO_TRUST_SELECTOR)))
+      .then(() => driver.findElement(By.css(DUO_TRUST_SELECTOR)).click())
+      .then(() =>
+        driver.wait(until.elementLocated(By.css(SAML_SUBMIT_SELECTOR)))
+      )
+      .then(() => driver.findElement(By.css(SAML_SUBMIT_SELECTOR)).click());
 
     console.log(
       "Waiting for aggietime response (potential DUO required here)..."

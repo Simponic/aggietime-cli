@@ -20,7 +20,7 @@ export default async () => {
 
   if (args.daemon) {
     try {
-      start_server(args.socket_path, args.pass_cmd, session.logout);
+      start_server(args, session.logout);
     } catch (e) {
       console.error(e);
       if (fs.existsSync(args.socket_path)) {
@@ -29,15 +29,17 @@ export default async () => {
     }
   } else if (args.action) {
     if (fs.existsSync(args.socket_path)) {
-      run_action(args.socket_path, args.action);
+      run_action(args);
     } else {
       console.error(`ERR: No such socket '${args.socket_path}'`);
     }
   }
 };
 
-const run_action = (socket_path, action) => {
+const run_action = (args) => {
+  const { socket_path, action, position_id } = args;
   const connection = net.connect(socket_path);
+
   connection.on("data", (data) => {
     if (Buffer.isBuffer(data)) {
       console.log(data.toString().trim());
@@ -46,7 +48,8 @@ const run_action = (socket_path, action) => {
     }
     connection.end();
   });
-  connection.write(JSON.stringify({ action }));
+
+  connection.write(JSON.stringify({ action, rest: { position_id } }));
 };
 
 const build_args = () => {
@@ -56,6 +59,11 @@ const build_args = () => {
     help: "Start server as a process blocking daemon",
     action: argparse.BooleanOptionalAction,
     default: false,
+  });
+
+  parser.add_argument("-pos", "--position-id", {
+    help: "Position ID (for usage with --action clock_in or clock_out)",
+    default: undefined,
   });
 
   parser.add_argument("-s", "--socket_path", {
@@ -84,7 +92,7 @@ const kill_server = (server, socket_path) => {
   }
 };
 
-const start_server = async (socket_path, login_cmd, on_exit = () => {}) => {
+const start_server = async ({ socket_path, pass_cmd }, on_exit = () => {}) => {
   if (fs.existsSync(socket_path)) {
     console.error(
       `ERR: Socket '${socket_path}' already exists.
@@ -95,7 +103,7 @@ specify another socket path with --socket_path`
     process.exit(1);
   }
 
-  const { anumber, password } = await retrieve_creds(login_cmd);
+  const { anumber, password } = await retrieve_creds(pass_cmd);
   await session.login(anumber, password);
 
   session.refresh_jwt();

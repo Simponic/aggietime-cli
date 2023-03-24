@@ -8,8 +8,8 @@ export const AGGIETIME_URL_CONTAINS_SIGNIFIES_AUTH_COMPLETE = "employee";
 
 export const REFRESH_JWT_MS = 5 * 1000 * 60;
 export const LOGIN_PATH = "api/v1/auth/login";
-export const CLOCKIN_PATH = "api/v1/positions/:position/clock_in";
-export const CLOCKOUT_PATH = "api/v1/positions/:position/clock_out";
+export const CLOCKIN_PATH = "api/v1/positions/:position_id/clock_in";
+export const CLOCKOUT_PATH = "api/v1/positions/:position_id/clock_out";
 export const USER_PATH = "api/v1/auth/get_user_info";
 export const OPEN_SHIFT_PATH = "api/v1/users/:anumber/open_shift";
 export const OPEN_SHIFT_EXP_SEC = 60;
@@ -20,6 +20,8 @@ export const SAML_SIGN_IN_TITLE = "Sign in to your account";
 export const SAML_SUBMIT_SELECTOR = "input[type=submit]";
 export const SAML_EMAIL_SELECTOR = "input[type=email]";
 export const SAML_PASSWORD_SELECTOR = "input[type=password]";
+
+export const DUO_TRUST_SELECTOR = "#trust-browser-button";
 
 export const MAX_DEFAULT_RETRY_AMOUNT = 3;
 export const WAIT_MS = 2000;

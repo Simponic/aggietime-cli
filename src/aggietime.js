@@ -21,16 +21,16 @@ const aggietime = client.create({
 const replace_path_args = (path, map) =>
   path.replaceAll(/:([a-zA-Z0-9_]+)/g, (_, key) => map[key]);
 
-const get_user_position_or_specified = async (position) => {
+const get_user_position_or_specified = async (position_id) => {
   const { positions } = await get_user_info();
 
-  if (!position && positions.length != 1) {
+  if (position_id === undefined && positions.length != 1) {
     throw "Must specify a position when there's not only one to choose from";
-  } else if (!position) {
-    position = positions[0];
+  } else if (position_id === undefined) {
+    return positions[0];
   }
 
-  return position;
+  return position_id;
 };
 
 export const get_user_info = async () => {
@@ -53,12 +53,12 @@ export const get_user_info = async () => {
   return expireCache.get("user");
 };
 
-const do_clock_mutation = async (path, { position } = {}) => {
-  position = await get_user_position_or_specified(position);
+const do_clock_mutation = async (path, { position_id } = {}) => {
+  position_id = await get_user_position_or_specified(position_id);
 
   return await aggietime
     .post(
-      replace_path_args(path, { position }),
+      replace_path_args(path, { position_id }),
       {
         comment: "",
       },
@@ -73,6 +73,8 @@ const do_clock_mutation = async (path, { position } = {}) => {
       return data;
     });
 };
+
+// Actions
 
 export const clock_in = async (rest) => do_clock_mutation(CLOCKIN_PATH, rest);
 export const clock_out = async (rest) => do_clock_mutation(CLOCKOUT_PATH, rest);
