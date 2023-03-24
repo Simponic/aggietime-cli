@@ -25,3 +25,5 @@ export const MAX_DEFAULT_RETRY_AMOUNT = 3;
 export const WAIT_MS = 2000;
 export const RETRY_EXPONENT = 1.2;
 export const RETRY_EXPONENTIAL_FACTOR = 1.1;
+
+export const DEFAULT_PASS_CMD = "pass usu.edu";

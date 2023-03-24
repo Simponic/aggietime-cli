@@ -2,11 +2,13 @@
 
 import {
   DEFAULT_SOCKET_PATH,
+  DEFAULT_PASS_CMD,
   KILL_SIGNALS,
   REFRESH_JWT_MS,
 } from "./constants.js";
 import * as actions from "./actions.js";
 import * as session from "./session.js";
+import retrieve_creds from "./retrieve_creds.js";
 import * as argparse from "argparse";
 import * as net from "net";
 import * as dotenv from "dotenv";
@@ -18,9 +20,12 @@ export default async () => {
 
   if (args.daemon) {
     try {
-      start_server(args.socket_path, session.logout);
-    } catch {
-      fs.unlinkSync(args.socket_path);
+      start_server(args.socket_path, args.pass_cmd, session.logout);
+    } catch (e) {
+      console.error(e);
+      if (fs.existsSync(args.socket_path)) {
+        fs.unlinkSync(args.socket_path);
+      }
     }
   } else if (args.action) {
     if (fs.existsSync(args.socket_path)) {
@@ -58,6 +63,11 @@ const build_args = () => {
     help: `Set server socket path, defaults to ${DEFAULT_SOCKET_PATH}`,
   });
 
+  parser.add_argument("-p", "--pass_cmd", {
+    default: DEFAULT_PASS_CMD,
+    help: `Set GNU pass retrieval command, defaults to ${DEFAULT_PASS_CMD}`,
+  });
+
   parser.add_argument("-a", "--action", {
     help: `Ignored when daemon flag is set. Returns the value of action (see actions.js) when sent over the socket.`,
   });
@@ -67,7 +77,6 @@ const build_args = () => {
 
 const kill_server = (server, socket_path) => {
   server.close();
-
   try {
     fs.unlinkSync(socket_path);
   } finally {
@@ -75,7 +84,7 @@ const kill_server = (server, socket_path) => {
   }
 };
 
-const start_server = async (socket_path, on_exit = () => {}) => {
+const start_server = async (socket_path, login_cmd, on_exit = () => {}) => {
   if (fs.existsSync(socket_path)) {
     console.error(
       `ERR: Socket '${socket_path}' already exists.
@@ -86,7 +95,8 @@ specify another socket path with --socket_path`
     process.exit(1);
   }
 
-  await session.login(process.env.A_NUMBER, process.env.PASSWORD);
+  const { anumber, password } = await retrieve_creds(login_cmd);
+  await session.login(anumber, password);
 
   session.refresh_jwt();
   setInterval(session.refresh_jwt, REFRESH_JWT_MS);
