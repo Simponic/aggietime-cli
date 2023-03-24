@@ -6,6 +6,7 @@ const ACTIONS = {
   "current-shift": aggietime.current_shift,
   "current-user": aggietime.get_user_info,
   "status-line": aggietime.get_status_line,
+  "past-week": aggietime.last_week,
 };
 
 export const do_action = async (body) => {

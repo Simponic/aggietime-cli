@@ -5,8 +5,10 @@ import {
   USER_CACHE_EXP_SEC,
   CLOCKIN_PATH,
   CLOCKOUT_PATH,
+  SUMMARY_PATH,
   OPEN_SHIFT_PATH,
   OPEN_SHIFT_EXP_SEC,
+  PAST_WEEK_EXP_SEC,
 } from "./constants.js";
 
 import { with_exponential_retry } from "./exponential_retry.js";
@@ -118,4 +120,31 @@ export const get_status_line = async () => {
     );
   }
   return { status: expireCache.get("status_line") };
+};
+
+export const last_week = async ({ position_id }) => {
+  position_id = await get_user_position_or_specified(position_id);
+  const [start, end] = [
+    ((d) => {
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day == 0 ? -6 : 1);
+      return new Date(d.setDate(diff));
+    })(new Date()),
+    new Date(),
+  ].map((d) => d.toISOString().split("T")[0]);
+
+  if (!expireCache.get("past_week")) {
+    const { anumber } = await get_user_info();
+
+    const hours = await aggietime
+      .get(replace_path_args(SUMMARY_PATH, { position_id, start, end }))
+      .then(({ data: { undisputed_hours } }) => undisputed_hours);
+
+    expireCache.set(
+      "past_week",
+      `${anumber} - ${hours} hours`,
+      PAST_WEEK_EXP_SEC
+    );
+  }
+  return { status: expireCache.get("past_week") };
 };

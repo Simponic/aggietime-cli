@@ -11,8 +11,11 @@ export const LOGIN_PATH = "api/v1/auth/login";
 export const CLOCKIN_PATH = "api/v1/positions/:position_id/clock_in";
 export const CLOCKOUT_PATH = "api/v1/positions/:position_id/clock_out";
 export const USER_PATH = "api/v1/auth/get_user_info";
+export const SUMMARY_PATH =
+  "api/v1/positions/:position_id/summary?start=:start&end=:end";
 export const OPEN_SHIFT_PATH = "api/v1/users/:anumber/open_shift";
 export const OPEN_SHIFT_EXP_SEC = 60;
+export const PAST_WEEK_EXP_SEC = 180;
 
 export const USER_CACHE_EXP_SEC = 30;
 
