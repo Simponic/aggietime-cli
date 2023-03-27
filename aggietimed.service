@@ -6,6 +6,7 @@ Wants=display.target
 Environment=DISPLAY=:0
 Type=simple
 ExecStart=/usr/bin/aggietimed -d -s /tmp/aggietimed.sock
+Restart=always
 
 [Install]
 WantedBy=default.target
