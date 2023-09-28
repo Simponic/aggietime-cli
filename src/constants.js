@@ -24,8 +24,6 @@ export const SAML_SUBMIT_SELECTOR = "input[type=submit]";
 export const SAML_EMAIL_SELECTOR = "input[type=email]";
 export const SAML_PASSWORD_SELECTOR = "input[type=password]";
 
-export const DUO_TRUST_SELECTOR = "#trust-browser-button";
-
 export const MAX_DEFAULT_RETRY_AMOUNT = 3;
 export const WAIT_MS = 2000;
 export const RETRY_EXPONENT = 1.2;

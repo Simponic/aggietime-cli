@@ -92,7 +92,7 @@ export const current_shift = async () => {
 
   if (`${AGGIETIME_URI}/${req_path}` != response_url) {
     // IMO a very weird decision - when there is no open shift the api redirects
-    // home instead of sending back a 404 or something actually *reasonable* :3
+    // home instead of sending back a 404 or something
     return null;
   }
 

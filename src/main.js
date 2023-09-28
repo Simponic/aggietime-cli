@@ -111,7 +111,7 @@ specify another socket path with --socket_path`
 
   const unix_server = net.createServer((client) => {
     client.on("data", (data) => {
-      // 4096 byte limitation since we don't buffer here :3
+      // 4096 byte limitation since we don't buffer here
       let body;
       try {
         body = JSON.parse(data);
