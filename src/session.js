@@ -21,6 +21,9 @@ export const refresh_jwt = () => {
   return aggietime.get_user_info();
 };
 
+export const setCookie = (jwt) =>
+  jar.setCookie(`${AGGIETIME_AUTH_COOKIE_NAME}=${jwt}`, AGGIETIME_URI);
+
 export const logout = () => client.get(`${AGGIETIME_URI}/${LOGOUT_PATH}`);
 
 export const login = async (a_number, password) => {
@@ -47,8 +50,8 @@ export const login = async (a_number, password) => {
       console.log("Waiting until password field is located...");
       await Promise.all(
         [SAML_PASSWORD_SELECTOR, SAML_SUBMIT_SELECTOR].map((selector) =>
-          driver.wait(until.elementLocated(By.css(selector)))
-        )
+          driver.wait(until.elementLocated(By.css(selector))),
+        ),
       );
 
       console.log("Filling password...");
@@ -66,7 +69,7 @@ export const login = async (a_number, password) => {
     }
 
     await driver.wait(
-      until.urlContains(AGGIETIME_URL_CONTAINS_SIGNIFIES_AUTH_COMPLETE)
+      until.urlContains(AGGIETIME_URL_CONTAINS_SIGNIFIES_AUTH_COMPLETE),
     );
 
     console.log("Retrieving cookie...");
@@ -77,7 +80,7 @@ export const login = async (a_number, password) => {
         ...cookie,
         key: cookie.name,
       }),
-      AGGIETIME_URI
+      AGGIETIME_URI,
     );
     console.log("Got it!");
   } finally {

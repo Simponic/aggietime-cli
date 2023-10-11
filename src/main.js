@@ -55,6 +55,12 @@ const run_action = (args) => {
 const build_args = () => {
   const parser = new argparse.ArgumentParser({ description: "AggieTime CLI" });
 
+  parser.add_argument("-cos", "--cookie-on-stdin", {
+    help: "Set a cookie from whatever is on stdin",
+    action: argparse.BooleanOptionalAction,
+    default: false,
+  });
+
   parser.add_argument("-d", "--daemon", {
     help: "Start server as a process blocking daemon",
     action: argparse.BooleanOptionalAction,
@@ -92,19 +98,28 @@ const kill_server = (server, socket_path) => {
   }
 };
 
-const start_server = async ({ socket_path, pass_cmd }, on_exit = () => {}) => {
+const start_server = async (
+  { cookie_on_stdin, socket_path, pass_cmd },
+  on_exit = () => {},
+) => {
   if (fs.existsSync(socket_path)) {
     console.error(
       `ERR: Socket '${socket_path}' already exists.
 If no server process is running, remove it (this should've been done automatically, except in the event of a catastrophic failure)
 OR
-specify another socket path with --socket_path`
+specify another socket path with --socket_path`,
     );
     process.exit(1);
   }
 
-  const { anumber, password } = await retrieve_creds(pass_cmd);
-  await session.login(anumber, password);
+  if (!cookie_on_stdin) {
+    const { anumber, password } = await retrieve_creds(pass_cmd);
+    await session.login(anumber, password);
+  } else {
+    let cookie = "";
+    for await (const chunk of process.stdin) cookie += chunk;
+    await session.setCookie(cookie);
+  }
 
   session.refresh_jwt();
   setInterval(session.refresh_jwt, REFRESH_JWT_MS);
@@ -140,6 +155,6 @@ specify another socket path with --socket_path`
 
   // Attempt to clean up socket before process gets killed
   KILL_SIGNALS.forEach((signal) =>
-    process.on(signal, () => kill_server(unix_server, socket_path))
+    process.on(signal, () => kill_server(unix_server, socket_path)),
   );
 };

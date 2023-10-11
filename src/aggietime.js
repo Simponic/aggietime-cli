@@ -43,11 +43,11 @@ export const get_user_info = async () => {
           .toJSON()
           .cookies.find(
             ({ domain, key }) =>
-              domain === AGGIETIME_DOMAIN && key === "XSRF-TOKEN"
+              domain === AGGIETIME_DOMAIN && key === "XSRF-TOKEN",
           ).value;
         expireCache.set("aggietime-csrf", csrf_token);
         return data;
-      })
+      }),
     );
 
     expireCache.set("user", user, USER_CACHE_EXP_SEC);
@@ -68,7 +68,7 @@ const do_clock_mutation = async (path, { position_id } = {}) => {
         headers: {
           "X-XSRF-TOKEN": expireCache.get("aggietime-csrf"),
         },
-      }
+      },
     )
     .then(({ data }) => {
       expireCache.remove("status_line");
@@ -109,14 +109,14 @@ export const get_status_line = async () => {
       const start = new Date(shift?.start);
       status_line =
         ((new Date().getTime() - start.getTime()) / (1000 * 60 * 60)).toFixed(
-          2
+          2,
         ) + " hours";
     }
 
     expireCache.set(
       "status_line",
       `${anumber} - ${status_line}`,
-      OPEN_SHIFT_EXP_SEC
+      OPEN_SHIFT_EXP_SEC,
     );
   }
   return { status: expireCache.get("status_line") };
@@ -143,7 +143,7 @@ export const last_week = async ({ position_id }) => {
     expireCache.set(
       "past_week",
       `${anumber} - ${hours} hours`,
-      PAST_WEEK_EXP_SEC
+      PAST_WEEK_EXP_SEC,
     );
   }
   return { status: expireCache.get("past_week") };

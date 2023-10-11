@@ -11,12 +11,12 @@ export const with_exponential_retry = async (
   promise_fn,
   validation_fn = (x) => Promise.resolve(!!x),
   max_retries = MAX_DEFAULT_RETRY_AMOUNT,
-  retries = 0
+  retries = 0,
 ) => {
   try {
     if (retries)
       await wait_for(
-        WAIT_MS * Math.pow(RETRY_EXPONENT, RETRY_EXPONENTIAL_FACTOR * retries)
+        WAIT_MS * Math.pow(RETRY_EXPONENT, RETRY_EXPONENTIAL_FACTOR * retries),
       );
 
     const res = await promise_fn();
@@ -29,7 +29,7 @@ export const with_exponential_retry = async (
       promise_fn,
       validation_fn,
       max_retries,
-      retries + 1
+      retries + 1,
     );
   }
 };
