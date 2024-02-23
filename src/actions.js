@@ -1,6 +1,6 @@
 import * as aggietime from "./aggietime.js";
 
-const ACTIONS = {
+export const ACTIONS = {
   "clock-in": aggietime.clock_in,
   "clock-out": aggietime.clock_out,
   "current-shift": aggietime.current_shift,

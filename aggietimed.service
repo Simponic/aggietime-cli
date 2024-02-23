@@ -7,6 +7,9 @@ Environment=DISPLAY=:0
 Type=simple
 ExecStart=/usr/bin/aggietimed -d -s /tmp/aggietimed.sock
 Restart=always
+StandardError=journal
+StandardOutput=journal
+StandardInput=null
 
 [Install]
 WantedBy=default.target

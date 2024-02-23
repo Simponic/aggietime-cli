@@ -26,9 +26,10 @@ const replace_path_args = (path, map) =>
 const get_user_position_or_specified = async (position_id) => {
   const { positions } = await get_user_info();
 
-  if (position_id === undefined && positions.length != 1) {
-    throw "Must specify a position when there's not only one to choose from";
-  } else if (position_id === undefined) {
+  if (position_id === undefined) {
+    if (positions.length != 1) {
+      throw "Must specify a position when there's not only one to choose from";
+    }
     return positions[0];
   }
 
@@ -83,20 +84,16 @@ export const clock_out = async (rest) => do_clock_mutation(CLOCKOUT_PATH, rest);
 
 export const current_shift = async () => {
   const req_path = replace_path_args(OPEN_SHIFT_PATH, await get_user_info());
-  const {
-    request: {
-      res: { responseUrl: response_url },
-    },
-    data,
-  } = await aggietime.get(req_path);
 
-  if (`${AGGIETIME_URI}/${req_path}` != response_url) {
-    // IMO a very weird decision - when there is no open shift the api redirects
-    // home instead of sending back a 404 or something
-    return null;
+  try {
+    const resp = await aggietime.get(req_path);
+    return resp.data;
+  } catch (e) {
+    if (e.response && e.response.status === 404) {
+      return null;
+    }
+    throw e;
   }
-
-  return data;
 };
 
 export const get_status_line = async () => {
@@ -122,8 +119,8 @@ export const get_status_line = async () => {
   return { status: expireCache.get("status_line") };
 };
 
-export const last_week = async ({ position_id }) => {
-  position_id = await get_user_position_or_specified(position_id);
+export const last_week = async (args) => {
+  const position_id = await get_user_position_or_specified(args.position_id);
   const [start, end] = [
     ((d) => {
       const day = d.getDay();
